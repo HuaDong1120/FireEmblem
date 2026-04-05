@@ -6,13 +6,13 @@ project(FireEmblem VERSION 0.0.1)
 
 
 file(GLOB_RECURSE SRC ./src/*.cpp ./src/*.c)
-
+file(GLOB_RECURSE ASSETS ./assets/*)
 
 set(GAME_NAME ${PROJECT_NAME})
 
 add_executable(${GAME_NAME})
 
-target_sources(${GAME_NAME} PRIVATE ${SRC})
+target_sources(${GAME_NAME} PRIVATE ${SRC} ${ASSETS})
 target_include_directories(${GAME_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_compile_features(${GAME_NAME} PRIVATE cxx_std_17)
 
@@ -22,7 +22,9 @@ find_package(SDL3_image REQUIRED CONFIG)
 find_package(SDL3_ttf REQUIRED CONFIG)
 find_package(imgui CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
-
+set_target_properties(${GAME_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         SDL3::SDL3
         SDL3_image::SDL3_image
@@ -38,4 +40,7 @@ if(WIN32)
             $<TARGET_FILE_DIR:${PROJECT_NAME}>
             COMMAND_EXPAND_LISTS
     )
+endif()
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  target_compile_options(${GAME_NAME} PRIVATE -g)
 endif()

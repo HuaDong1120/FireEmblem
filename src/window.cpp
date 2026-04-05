@@ -1,17 +1,12 @@
 #include "window.hpp"
-#include "log.hpp"
 #include "math.hpp"
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_video.h>
+#include "sdl_call.hpp"
 
 Window::Window(const std::string&title,int w,int h)
 {
-    m_window =  SDL_CreateWindow(title.c_str(), w, h, 0);
-    if(!m_window)
-    {
-        LOG_ERROR("create SDL window failed!{}",SDL_GetError());
-    }
-
+    SDL_CALL_PTR(m_window,SDL_CreateWindow(title.c_str(), w, h, 0));
 }
 
 Window::~Window()
@@ -25,6 +20,6 @@ SDL_Window* Window::GetWindow()
 Vec2 Window::GetWindowSize()const
 {
     int w,h;
-    SDL_GetWindowSize(m_window, &w, &h);
+    SDL_CALL(SDL_GetWindowSize(m_window, &w, &h));
     return Vec2(w,h);
 }

@@ -1,0 +1,19 @@
+// Project-local debug tasks
+//
+// For more documentation on how to configure debug tasks,
+// see: https://zed.dev/docs/debugger
+
+[
+  {
+    "label": "Debug FireEmblem",
+    "build": {
+      "command": "mingw32-make",
+      "args": ["-j8"],
+      "cwd": "$ZED_WORKTREE_ROOT/build",
+    },
+    "program": "$ZED_WORKTREE_ROOT/FireEmblem.exe",
+    "request": "launch",
+    "adapter": "GDB",
+    "gdb": "C:/msys64/ucrt64/bin/gdb.exe",
+  },
+]
