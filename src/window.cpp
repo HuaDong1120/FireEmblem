@@ -6,7 +6,7 @@
 
 Window::Window(const std::string&title,int w,int h)
 {
-    SDL_CALL_PTR(m_window,SDL_CreateWindow(title.c_str(), w, h, 0));
+    SDL_CALL_PTR(m_window,SDL_CreateWindow(title.c_str(), w, h, SDL_WINDOW_RESIZABLE));
 }
 
 Window::~Window()
