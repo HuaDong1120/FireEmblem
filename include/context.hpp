@@ -1,10 +1,12 @@
 #pragma once
 
+
 #include "renderer.hpp"
 #include "window.hpp"
 #include "image.hpp"
 #include "tilemap.hpp"
 #include "path.hpp"
+#include "inspector.hpp"
 #include <SDL3/SDL_events.h>
 #include <memory>
 
@@ -39,6 +41,7 @@ private:
     std::unique_ptr<Renderer>     m_renderer;
     std::unique_ptr<ImageManager> m_image_manager;
     std::unique_ptr<TileMap>      m_tilemap;
+    std::unique_ptr<Inspector>   m_inspector;
     static std::unique_ptr<Context> instance;
 
     void UpdatePose();

@@ -120,4 +120,9 @@ private:
 
     const TilesetInfo* FindTileset(int gid) const;
     void               BuildTerrainGrid();
+
+    // JSON 加载路径（.tmj / .json）
+    bool LoadJSON(const Path& json_path, ImageManager& img_mgr);
+    // TMX 加载路径（.tmx，Tiled 原生 XML）
+    bool LoadTMX(const Path& tmx_path, ImageManager& img_mgr);
 };

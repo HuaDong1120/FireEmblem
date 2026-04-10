@@ -40,6 +40,7 @@ void Context::update()
 }
 void Context::HandleEvents(const SDL_Event&e)
 {
+    m_inspector->HandleEvent(e);
     if(e.type == SDL_EVENT_QUIT)
     {
         m_should_exit = true;
@@ -57,13 +58,17 @@ Context::Context()
     m_window       = std::make_unique<Window>("FireEmblem", 1024, 720);
     m_renderer     = std::make_unique<Renderer>(*m_window);
     m_image_manager = std::make_unique<ImageManager>(*m_renderer);
-    m_tilemap      = std::make_unique<TileMap>();
+    m_inspector    = std::make_unique<Inspector>(*m_window, *m_renderer);
+    m_tilemap = std::make_unique<TileMap>();
+    m_tilemap->Load("assets/Fire.tmx", *m_image_manager, *m_renderer);
 }
 Context::~Context()
 {
     m_image_manager.reset();
     m_window.reset();
     m_renderer.reset();
+    m_tilemap.reset();
+    m_inspector.reset();
     SDL_Quit();
 }
 
@@ -85,11 +90,13 @@ void Context::LoadMap(const Path& json_path)
 
 void Context::renderUpdate()
 {
+    m_inspector->BeginFrame();
     m_renderer->Clear();
 
     if (m_tilemap->IsLoaded()) {
         m_tilemap->Render(*m_renderer, *m_image_manager, m_camera_offset);
     }
-
+    m_inspector->Update();
+    m_inspector->EndFrame();
     m_renderer->Present();
 }
