@@ -55,6 +55,9 @@ bool Context::ShouldExit()
 Context::Context()
 {
     SDL_Init(SDL_INIT_EVENTS|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK|SDL_INIT_GAMEPAD);
+#ifdef SDL_PLATFORM_ANDROID
+    SDL_SetHint(SDL_HINT_ORIENTATIONS,"LandscapeLeft");
+#endif
     m_window       = std::make_unique<Window>("FireEmblem", 1024, 720);
     m_renderer     = std::make_unique<Renderer>(*m_window);
     m_image_manager = std::make_unique<ImageManager>(*m_renderer);

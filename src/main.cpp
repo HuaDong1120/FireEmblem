@@ -12,10 +12,11 @@
 #include "context.hpp"
 SDL_AppResult SDL_AppInit(void **appstate,int argc,char **argv)
 {
-    Context::Init();
     Logger::instance().enableFile(true);
     Logger::instance().initialize("logs", "FireEmblem");
     LOG_INFO("game start");
+    Context::Init();
+   
     return SDL_APP_CONTINUE;
 }
 

@@ -6,7 +6,9 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_surface.h>
 #include <fmt/chrono.h>
+#include <vector>
 #include <memory>
+#include <SDL3/SDL_storage.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 Image::Image(Renderer& renderer, SDL_Surface* surface) {
@@ -19,10 +21,35 @@ Image::Image(Renderer& renderer, SDL_Surface* surface) {
     SDL_DestroySurface(surface);
 }
 
-Image::Image(Renderer& renderer,const Path& filename) {
+Image::Image(Renderer& renderer,const Path& filename)
+{
     int w, h;
-
-    stbi_uc* data =stbi_load(filename.string().c_str(),&w,&h,nullptr,STBI_rgb_alpha);
+    SDL_Storage* storage = SDL_OpenFileStorage(".");
+    if (!storage)
+    {
+        LOG_ERROR("create storage failed");
+    }
+    while (!SDL_StorageReady(storage))
+    {
+        SDL_Delay(10);
+    }
+    Uint64 file_size = 0;
+    std::string filepath = filename.generic_string();
+    SDL_CALL(SDL_GetStorageFileSize(storage,filepath.c_str(),&file_size));
+    
+    LOG_INFO("loading image: [{}]", filepath);
+    if (file_size == 0) {
+        LOG_ERROR("file not found or size=0: {}", filepath);
+        SDL_CloseStorage(storage);
+        return;
+    }
+    
+    std::vector<char> content(file_size);
+    SDL_CALL(SDL_ReadStorageFile(storage,filepath.c_str(),content.data(),file_size));
+    
+    SDL_CloseStorage(storage);
+    
+    stbi_uc* data =stbi_load_from_memory((const stbi_uc*)content.data(),content.size(),&w,&h,nullptr,STBI_rgb_alpha);
 
     if(!data)
     {
