@@ -9,6 +9,10 @@
 #include <SDL3/SDL_oldnames.h>
 #include <memory>
 #include "SDL3/SDL.h"
+
+
+#define  SDL_WINDOW_WIDTH_ 960
+#define  SDL_WINDOW_HEIGHT_ 640
 std::unique_ptr<Context> Context::instance = nullptr;
 void Context::Init()
 {
@@ -41,6 +45,7 @@ void Context::update()
 void Context::HandleEvents(const SDL_Event&e)
 {
     m_inspector->HandleEvent(e);
+    m_cursor->HandleEvent(e);
     if(e.type == SDL_EVENT_QUIT)
     {
         m_should_exit = true;
@@ -58,12 +63,14 @@ Context::Context()
 #ifdef SDL_PLATFORM_ANDROID
     SDL_SetHint(SDL_HINT_ORIENTATIONS,"LandscapeLeft");
 #endif
-    m_window       = std::make_unique<Window>("FireEmblem", 1024, 720);
+    m_window       = std::make_unique<Window>("FireEmblem", SDL_WINDOW_WIDTH_, SDL_WINDOW_HEIGHT_);
     m_renderer     = std::make_unique<Renderer>(*m_window);
     m_image_manager = std::make_unique<ImageManager>(*m_renderer);
     m_inspector    = std::make_unique<Inspector>(*m_window, *m_renderer);
     m_tilemap = std::make_unique<TileMap>();
     m_tilemap->Load("assets/Fire.tmx", *m_image_manager, *m_renderer);
+    Image* cursor_img = m_image_manager->load("assets/FE_cursor.png");
+    m_cursor = std::make_unique<Cursor>(cursor_img);
 }
 Context::~Context()
 {
@@ -81,8 +88,12 @@ void Context::UpdatePose()
 }
 
 void Context::logicUpdate()
-{
+{ static Uint64 last_time = SDL_GetTicks();
+    Uint64 now = SDL_GetTicks();
+    float delta = (now - last_time) / 1000.0f;
+    last_time = now;
 
+    m_cursor->Update(*m_tilemap, delta);
 }
 void Context::LoadMap(const Path& json_path)
 {
@@ -99,6 +110,7 @@ void Context::renderUpdate()
     if (m_tilemap->IsLoaded()) {
         m_tilemap->Render(*m_renderer, *m_image_manager, m_camera_offset);
     }
+    m_cursor->Render(*m_renderer, *m_tilemap, m_camera_offset);
     m_inspector->Update();
     m_inspector->EndFrame();
     m_renderer->Present();
